@@ -13,7 +13,8 @@ app.get('/video/:id', async (req, res) => {
     const id = req.params.id
     const link: string = String(req.query.link || '')
     const image = await getAndCacheImageByVideo(link, id)
-    res.json({image, id, link})
+    const is_exist_image = !!image
+    res.json({image, id, link, is_exist_image})
 })
 
 const PORT = process.env.PORT || 3001
