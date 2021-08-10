@@ -65,3 +65,7 @@ export const getAndCacheImageByVideo = async (uri: string, id: string, options?:
     if (!isCreated) return ''
     return getBase64File(output_path)
 }
+
+
+//test case
+//http://localhost:3001/video/18?link=https://storage.yandexcloud.net/videopreviewer/Cat%20-%2066004.mp4
