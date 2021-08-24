@@ -68,7 +68,7 @@ const getAndCacheImageByVideo = async (uri = '', fileNameWithoutWxt = '', option
     args.push(output_path)
     console.log(resultFileUrl, 'resultFileUrl', output_path, 'output_path')
     const isCreated = await new Promise((ok, err) => {
-        exec('./ffmpeg ' + args.join(' '), (err, stdout, stderr) => {
+        exec(`${ffmpegPath} ` + args.join(' '), (err, stdout, stderr) => {
             console.log(err, stdout, stderr, 'err, stdout, stderr')
             const isCreated = !err
             console.log('image created is', isCreated ? 'success' : 'failure', 'with err', err)
@@ -117,7 +117,7 @@ const test = () => {
     getBacketFileAndImage('cat6.mp4', 'videopreviewer')//should be exit with code 0
 }
 
-test()
+// test()
 
 module.exports.handler = videopreview
 

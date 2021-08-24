@@ -138,7 +138,7 @@ var getAndCacheImageByVideo = function (uri, fileNameWithoutWxt, options) {
                     args.push(output_path);
                     console.log(resultFileUrl, 'resultFileUrl', output_path, 'output_path');
                     return [4 /*yield*/, new Promise(function (ok, err) {
-                            exec('./ffmpeg ' + args.join(' '), function (err, stdout, stderr) {
+                            exec(ffmpegPath + " " + args.join(' '), function (err, stdout, stderr) {
                                 console.log(err, stdout, stderr, 'err, stdout, stderr');
                                 var isCreated = !err;
                                 console.log('image created is', isCreated ? 'success' : 'failure', 'with err', err);
@@ -214,5 +214,5 @@ var videopreview = function (event) {
 var test = function () {
     getBacketFileAndImage('cat6.mp4', 'videopreviewer'); //should be exit with code 0
 };
-test();
+// test()
 module.exports.handler = videopreview;
