@@ -7,18 +7,19 @@
     "dev:watch": "nodemon index.ts",
     "dev:start": "ts-node index.ts",
     "start": "node build/index.js",
-    "build": "npx tsc"
+    "build": "npx tsc",
+    "delpoy": "rm -rf index.zip && rm -rf tmp/* && zip -r -X \"index.zip\" ./index.js ./package.json ./tmp && yc serverless function version create --function-name=videopreviewer --runtime nodejs14 --entrypoint index.handler --memory 128m --execution-timeout 3s --source-path ./index.zip"
   },
   "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@types/axios": "^0.14.0",
     "@types/express": "^4.17.13",
-    "@types/ffmpeg": "^1.0.4",
-    "@types/fluent-ffmpeg": "^2.1.18",
     "@types/moment": "^2.13.0",
     "axios": "^0.21.1",
     "express": "^4.17.1",
-    "fluent-ffmpeg": "^2.1.2",
-    "media-thumbnail": "^1.0.0",
-    "moment": "^2.29.1",
-    "typescript": "^4.3.5"
+    "js-ffmpeg": "^0.0.29",
+    "moment": "2.14.1",
+    "typescript": "^4.3.5",
+    "video-previews": "^1.0.4"
   }
 }

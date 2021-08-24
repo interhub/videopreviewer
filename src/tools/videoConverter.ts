@@ -1,12 +1,14 @@
 import fs from 'fs'
 import moment from 'moment'
 import {spawn} from 'child_process'
+import {path as ffmpegPath} from '@ffmpeg-installer/ffmpeg'
 
 type MediaOptionsType = {
     width?: number;
     height?: number;
     seconds?: number
 }
+
 
 const OUT_FOLDER = 'cache'
 const OUT_FORMAT = 'jpg'
@@ -35,6 +37,7 @@ const getCacheImage = async (path: string) => {
 
 export const getAndCacheImageByVideo = async (uri: string, id: string, options?: MediaOptionsType) => {
     const encodeUri = encodeURI(uri)
+    console.log(encodeUri,'encodeUri')
     const output_path = `./${OUT_FOLDER}/${id}.${OUT_FORMAT}`
     const {cachedImage, isCached} = await getCacheImage(output_path)
     if (isCached) return cachedImage
@@ -52,7 +55,7 @@ export const getAndCacheImageByVideo = async (uri: string, id: string, options?:
     const isCreated = await new Promise((ok, err) => {
         let convert
         convert = spawn(
-            './ffmpeg',
+            ffmpegPath,
             args,
             {shell: true,}
         )
