@@ -11,6 +11,7 @@ const OUT_FORMAT = 'jpg'
 
 
 const getBlobLocalFile = async (path) => {
+    if (!path) return ''
     try {
         const data = await fs.promises.readFile(path)
         return String(data)
@@ -44,9 +45,9 @@ const normalizeUriString = (uri = '') => {
     return encodeURI(uri)
 }
 
-const getAndCacheImageByVideo = async (uri = '', id, options) => {
+const getAndCacheImageByVideo = async (uri = '', fileNameWithoutWxt, options) => {
     const resultFileUrl = normalizeUriString()
-    const output_path = `./${OUT_FOLDER}/${id}.${OUT_FORMAT}`
+    const output_path = `./${OUT_FOLDER}/${fileNameWithoutWxt}.${OUT_FORMAT}`
     const {cachedImage, isCached} = await getCacheImage(output_path)
     if (isCached) {
         await removeFile(output_path)
@@ -81,10 +82,11 @@ const getAndCacheImageByVideo = async (uri = '', id, options) => {
     return imageData
 }
 
-const getBacketFileAndImage = async (fileName, backetName) => {
+const getBacketFileAndImage = async (fileName = '', backetName = '') => {
     if (!fileName) return {}
     const fullUrl = `${backetDefaultBase}/${backetName}/${fileName}`
-    const image = (await getAndCacheImageByVideo(fullUrl, fileName)) || {}
+    const fileNameWithoutExt = fileName.replace(/(.mp4)$/, '')
+    const image = (await getAndCacheImageByVideo(fullUrl, fileNameWithoutExt)) || ''
     const {data: video = {}} = await axios.get(fullUrl, {responseType: 'blob'})
     console.log(image.length || 0, 'size image\n', video.length || 0, 'size video')
     return {video, image}
@@ -92,7 +94,7 @@ const getBacketFileAndImage = async (fileName, backetName) => {
 
 
 const videopreview = async function (event = {}, context) {
-    const fileName = (event.messages ? event.messages[0].details.object_id : '').replace(/(.mp4)$/, '')
+    const fileName = (event.messages ? event.messages[0].details.object_id : '')
     if (!fileName) return {
         statusCode: 400,
         body: {message: 'file name is not correct'},
