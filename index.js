@@ -40,8 +40,12 @@ const removeFile = async (path) => {
     }
 }
 
-const getAndCacheImageByVideo = async (uri, id, options) => {
-    const encodeUri = encodeURI(uri)
+const normalizeUriString = (uri = '') => {
+    return encodeURI(uri)
+}
+
+const getAndCacheImageByVideo = async (uri = '', id, options) => {
+    const resultFileUrl = normalizeUriString()
     const output_path = `./${OUT_FOLDER}/${id}.${OUT_FORMAT}`
     const {cachedImage, isCached} = await getCacheImage(output_path)
     if (isCached) {
@@ -54,7 +58,7 @@ const getAndCacheImageByVideo = async (uri, id, options) => {
     if (width && height) {
         args.push(`-vf "thumbnail,scale=${width}:${height}"`)
     }
-    args.push(`-i ${encodeUri}`)
+    args.push(`-i ${resultFileUrl}`)
     args.push(`-ss ${time}`)
     args.push(' -vframes 1')
     args.push(output_path)
@@ -88,7 +92,7 @@ const getBacketFileAndImage = async (fileName, backetName) => {
 
 
 const videopreview = async function (event = {}, context) {
-    const fileName = event.messages ? event.messages[0].details.object_id : ''
+    const fileName = (event.messages ? event.messages[0].details.object_id : '').replace(/(.mp4)$/, '')
     if (!fileName) return {
         statusCode: 400,
         body: {message: 'file name is not correct'},
