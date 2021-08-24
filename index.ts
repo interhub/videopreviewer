@@ -1,8 +1,9 @@
-const {spawn} = require('child_process')
+const {exec} = require('child_process')
 const moment = require('moment')
 const axios = require('axios')
 const {path: ffmpegPath} = require('@ffmpeg-installer/ffmpeg')
 const fs = require('fs')
+const path = require('path')
 
 const backetDefaultBase = 'https://storage.yandexcloud.net'
 const OUT_FOLDER = 'tmp'
@@ -65,16 +66,12 @@ const getAndCacheImageByVideo = async (uri = '', fileNameWithoutWxt = '', option
     args.push(`-ss ${time}`)
     args.push(' -vframes 1')
     args.push(output_path)
+    console.log(resultFileUrl, 'resultFileUrl', output_path, 'output_path')
     const isCreated = await new Promise((ok, err) => {
-        let convert
-        convert = spawn(
-            ffmpegPath,
-            args,
-            {shell: true,}
-        )
-        convert.on('exit', (code) => {
-            const isCreated = code === 0
-            console.log('image created is', isCreated ? 'success' : 'failure', 'with code', code)
+        exec('./ffmpeg ' + args.join(' '), (err, stdout, stderr) => {
+            console.log(err, stdout, stderr, 'err, stdout, stderr')
+            const isCreated = !err
+            console.log('image created is', isCreated ? 'success' : 'failure', 'with err', err)
             ok(isCreated)
         })
     })
@@ -115,6 +112,12 @@ const videopreview = async function (event?: EventType) {
         body: String(`data:${image}`),
     }
 }
+
+const test = () => {
+    getBacketFileAndImage('cat6.mp4', 'videopreviewer')//should be exit with code 0
+}
+
+test()
 
 module.exports.handler = videopreview
 
