@@ -81,7 +81,7 @@ var getCacheImage = function (path) { return __awaiter(_this, void 0, void 0, fu
                 return [2 /*return*/, { cachedImage: cachedImage, isCached: !!cachedImage }];
             case 3:
                 e_2 = _a.sent();
-                console.log('getCacheImage', e_2);
+                // console.log('getCacheImage', e)
                 return [2 /*return*/, { image: '', isCached: false }];
             case 4: return [2 /*return*/];
         }
@@ -211,8 +211,4 @@ var videopreview = function (event) {
         });
     });
 };
-var test = function () {
-    getBacketFileAndImage('cat6.mp4', 'videopreviewer'); //should be exit with code 0
-};
-// test()
 module.exports.handler = videopreview;

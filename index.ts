@@ -27,7 +27,7 @@ const getCacheImage = async (path) => {
         const cachedImage = await getBlobLocalFile(path)
         return {cachedImage, isCached: !!cachedImage}
     } catch (e) {
-        console.log('getCacheImage', e)
+        // console.log('getCacheImage', e)
         return {image: '', isCached: false}
     }
 }
@@ -112,12 +112,6 @@ const videopreview = async function (event?: EventType) {
         body: String(`data:${image}`),
     }
 }
-
-const test = () => {
-    getBacketFileAndImage('cat6.mp4', 'videopreviewer')//should be exit with code 0
-}
-
-// test()
 
 module.exports.handler = videopreview
 
