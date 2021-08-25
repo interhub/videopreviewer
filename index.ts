@@ -134,6 +134,10 @@ export const videopreview = async function (event?: EventType) {
         statusCode: 400,
         body: {message: 'file name is not correct'},
     }
+    if (!fileName.match(/(.mp4)$/)?.length) return {
+        statusCode: 400,
+        body: {message: 'video should be mp4'},
+    }
     const {image, video, resultImageName} = await getBacketFileAndImage(fileName)
     uploadFileToBacket(image, resultImageName)
     return {
@@ -143,4 +147,5 @@ export const videopreview = async function (event?: EventType) {
 }
 
 module.exports.handler = videopreview
+
 

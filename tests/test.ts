@@ -11,5 +11,10 @@ describe('test upload video', function () {
         const {statusCode} = await videopreview({messages: [{details: {object_id: testFileName}}]})
         expect(statusCode).toBe(200)
     })
+    test('upload file should not work for ext instead of mp4', async () => {
+        const testFileName = 'cat.jpg'
+        const {statusCode} = await videopreview({messages: [{details: {object_id: testFileName}}]})
+        expect(statusCode).toBe(400)
+    })
 })
 

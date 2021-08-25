@@ -214,10 +214,11 @@ var uploadFileToBacket = function (file, fileName) {
 };
 exports.uploadFileToBacket = uploadFileToBacket;
 var videopreview = function (event) {
+    var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var fileName, _a, image, video, resultImageName;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var fileName, _b, image, video, resultImageName;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     fileName = (event === null || event === void 0 ? void 0 : event.messages) ? event.messages[0].details.object_id : '';
                     if (!fileName)
@@ -225,9 +226,14 @@ var videopreview = function (event) {
                                 statusCode: 400,
                                 body: { message: 'file name is not correct' }
                             }];
+                    if (!((_a = fileName.match(/(.mp4)$/)) === null || _a === void 0 ? void 0 : _a.length))
+                        return [2 /*return*/, {
+                                statusCode: 400,
+                                body: { message: 'video should be mp4' }
+                            }];
                     return [4 /*yield*/, getBacketFileAndImage(fileName)];
                 case 1:
-                    _a = _b.sent(), image = _a.image, video = _a.video, resultImageName = _a.resultImageName;
+                    _b = _c.sent(), image = _b.image, video = _b.video, resultImageName = _b.resultImageName;
                     exports.uploadFileToBacket(image, resultImageName);
                     return [2 /*return*/, {
                             statusCode: 200,
