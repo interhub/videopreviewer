@@ -149,7 +149,7 @@ const test = async () => {
     console.log(res.statusCode, '= result code should be 200 ⚙️ ')
 }
 
-test()
+// test()
 
 module.exports.handler = videopreview
 
