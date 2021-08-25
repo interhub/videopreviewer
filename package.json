@@ -8,7 +8,7 @@
     "dev:start": "ts-node index.ts",
     "start": "node build/index.js",
     "build:zip": "rm -rf index.zip && npx tsc index.ts && zip -r -X \"index.zip\" ./ffmpeg ./index.js ./package.json",
-    "delpoy": "rm -rf index.zip && npx tsc index.ts && zip -r -X \"index.zip\" ./index.js ./tmp ./package.json && yc serverless function version create --function-name=videopreviewer --runtime nodejs14 --entrypoint index.handler --memory 128m --execution-timeout 3s --source-path ./index.zip",
+    "delpoy": "rm -rf index.zip && npx tsc index.ts && zip -r -X \"index.zip\" ./index.js ./package.json && yc serverless function version create --function-name=videopreviewer --runtime nodejs14 --entrypoint index.handler --memory 128m --execution-timeout 3s --source-path ./index.zip",
     "upload:zip": "ts-node upload.ts"
   },
   "dependencies": {
