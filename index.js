@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+exports.videopreview = exports.uploadFileToBacket = void 0;
 var AWS = require('aws-sdk');
 var exec = require('child_process').exec;
 var moment = require('moment');
@@ -211,6 +212,7 @@ var uploadFileToBacket = function (file, fileName) {
         console.log('uploadFileToBacket', e);
     }
 };
+exports.uploadFileToBacket = uploadFileToBacket;
 var videopreview = function (event) {
     return __awaiter(this, void 0, void 0, function () {
         var fileName, _a, image, video, resultImageName;
@@ -226,7 +228,7 @@ var videopreview = function (event) {
                     return [4 /*yield*/, getBacketFileAndImage(fileName)];
                 case 1:
                     _a = _b.sent(), image = _a.image, video = _a.video, resultImageName = _a.resultImageName;
-                    uploadFileToBacket(image, resultImageName);
+                    exports.uploadFileToBacket(image, resultImageName);
                     return [2 /*return*/, {
                             statusCode: 200,
                             body: { image: image, video: video }
@@ -235,22 +237,5 @@ var videopreview = function (event) {
         });
     });
 };
-var test = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var testFileName, res;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                testFileName = 'cat.mp4';
-                return [4 /*yield*/, uploadFileToBacket(fs.readFileSync(testFileName, 'binary'), testFileName)];
-            case 1:
-                _a.sent();
-                return [4 /*yield*/, videopreview({ messages: [{ details: { object_id: testFileName } }] })];
-            case 2:
-                res = _a.sent();
-                console.log(res.statusCode, '= result code should be 200 ⚙️ ');
-                return [2 /*return*/];
-        }
-    });
-}); };
-test();
-module.exports.handler = videopreview;
+exports.videopreview = videopreview;
+module.exports.handler = exports.videopreview;

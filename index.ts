@@ -99,7 +99,7 @@ const getBacketFileAndImage = async (fileName = '') => {
     return {video, image, resultImageName}
 }
 
-const uploadFileToBacket = (file: string, fileName: string) => {
+export const uploadFileToBacket = (file: string, fileName: string) => {
     try {
         const config = {
             endpoint: backetDefaultBase,
@@ -128,7 +128,7 @@ type EventType = {
     messages: [{ details: { object_id: string } }]
 }
 
-const videopreview = async function (event?: EventType) {
+export const videopreview = async function (event?: EventType) {
     const fileName = event?.messages ? event.messages[0].details.object_id : ''
     if (!fileName) return {
         statusCode: 400,
@@ -141,15 +141,6 @@ const videopreview = async function (event?: EventType) {
         body: {image, video},
     }
 }
-
-const test = async () => {
-    const testFileName = 'cat.mp4'
-    await uploadFileToBacket(fs.readFileSync(testFileName, 'binary'), testFileName)
-    const res = await videopreview({messages: [{details: {object_id: testFileName}}]})
-    console.log(res.statusCode, '= result code should be 200 ⚙️ ')
-}
-
-// test()
 
 module.exports.handler = videopreview
 
