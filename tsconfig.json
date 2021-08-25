@@ -5,7 +5,10 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "outDir": "build"
+    "outDir": "build",
+    "lib": [
+      "es2015"
+    ]
   },
   "exclude": [
     "node_modules"

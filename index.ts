@@ -1,20 +1,25 @@
+export {}
+const AWS = require('aws-sdk')
 const {exec} = require('child_process')
 const moment = require('moment')
 const axios = require('axios')
 const {path: ffmpegPath} = require('@ffmpeg-installer/ffmpeg')
 const fs = require('fs')
-const path = require('path')
+require('dotenv').config()
+
 
 const backetDefaultBase = 'https://storage.yandexcloud.net'
+const backetDefaultName = 'videopreviewer'
+
 const OUT_FOLDER = 'tmp'
 const OUT_FORMAT = 'jpg'
 
+const isCachingImages = false
 
 const getBlobLocalFile = async (path) => {
     if (!path) return ''
     try {
-        const data = await fs.promises.readFile(path)
-        return String(data)
+        return await fs.promises.readFile(path, 'binary')
     } catch (e) {
         console.log('getBlobLocalFile', e)
         return ''
@@ -27,7 +32,6 @@ const getCacheImage = async (path) => {
         const cachedImage = await getBlobLocalFile(path)
         return {cachedImage, isCached: !!cachedImage}
     } catch (e) {
-        // console.log('getCacheImage', e)
         return {image: '', isCached: false}
     }
 }
@@ -47,13 +51,15 @@ type OptionsType = {
     seconds?: number;
 }
 
-const getAndCacheImageByVideo = async (uri = '', fileNameWithoutWxt = '', options?: OptionsType) => {
+
+const getAndCacheImageByVideo = async (uri = '', fileNameWithoutWxt = '', options?: OptionsType): Promise<string> => {
     console.log('getAndCacheImageByVideo start', uri, fileNameWithoutWxt, options)
     const resultFileUrl = encodeURI(uri)
     const output_path = `./${OUT_FOLDER}/${fileNameWithoutWxt}.${OUT_FORMAT}`
     const {cachedImage, isCached} = await getCacheImage(output_path)
     if (isCached) {
-        await removeFile(output_path)
+        if (!isCachingImages)
+            await removeFile(output_path)
         return cachedImage
     }
     const {width = 0, height = 0, seconds = 0} = options || {}
@@ -77,23 +83,49 @@ const getAndCacheImageByVideo = async (uri = '', fileNameWithoutWxt = '', option
     })
     if (!isCreated) return ''
     const imageData = await getBlobLocalFile(output_path)
-    await removeFile(output_path)
+    if (!isCachingImages)
+        await removeFile(output_path)
     return imageData
 }
 
-const getBacketFileAndImage = async (fileName = '', backetName = '') => {
+const getBacketFileAndImage = async (fileName = '') => {
     if (!fileName) return {}
-    const fullUrl = `${backetDefaultBase}/${backetName}/${fileName}`
+    const fullUrl = `${backetDefaultBase}/${backetDefaultName}/${fileName}`
     const fileNameWithoutExt = fileName.replace(/(.mp4)$/, '')
+    const resultImageName = `${fileNameWithoutExt}.${OUT_FORMAT}`
     const image = (await getAndCacheImageByVideo(fullUrl, fileNameWithoutExt)) || ''
     const {data: video = {}} = await axios.get(fullUrl, {responseType: 'blob'})
     console.log((image?.length || 0), 'size image', (video?.length || 0), 'size video')
-    return {video, image}
+    return {video, image, resultImageName}
+}
+
+const uploadFileToBacket = (file: string, fileName: string) => {
+    try {
+        const config = {
+            endpoint: backetDefaultBase,
+            region: 'ru-central1',
+            accessKeyId: process.env.KEY_ID,
+            secretAccessKey: process.env.KEY,
+        }
+
+        const s3 = new AWS.S3(config)
+        const Body = Buffer.from(file, 'binary')
+
+        s3.putObject({
+            Body,
+            Bucket: backetDefaultName,
+            Key: fileName,
+        }).promise().then((data) => {
+            console.log(data, 'success ✅ ')
+        })
+    } catch (e) {
+        console.log('uploadFileToBacket', e)
+    }
 }
 
 
 type EventType = {
-    messages: [{ details: { object_id: string, bucket_id: string } }]
+    messages: [{ details: { object_id: string } }]
 }
 
 const videopreview = async function (event?: EventType) {
@@ -102,16 +134,22 @@ const videopreview = async function (event?: EventType) {
         statusCode: 400,
         body: {message: 'file name is not correct'},
     }
-    const backetDefaultName = 'videopreviewer'
-    const backetName = event?.messages ? event.messages[0].details?.bucket_id : backetDefaultName
-    console.log(backetName, 'backetName', fileName, 'fileName')
-    const {image} = await getBacketFileAndImage(fileName, backetName)
-
+    const {image, video, resultImageName} = await getBacketFileAndImage(fileName)
+    uploadFileToBacket(image, resultImageName)
     return {
         statusCode: 200,
-        body: String(`data:${image}`),
+        body: {image, video},
     }
 }
+
+const test = async () => {
+    const testFileName = 'cat.mp4'
+    await uploadFileToBacket(fs.readFileSync(testFileName, 'binary'), testFileName)
+    const res = await videopreview({messages: [{details: {object_id: testFileName}}]})
+    console.log(res.statusCode, '= result code should be 200 ⚙️ ')
+}
+
+test()
 
 module.exports.handler = videopreview
 
